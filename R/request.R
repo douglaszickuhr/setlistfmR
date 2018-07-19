@@ -67,7 +67,7 @@ get_request <- function(endpoint, key, params){
 
   result %<>%
     purrr::map_df(magrittr::extract) %>%
-    dplyr::mutate_if(is.character, funs(replace(., . %in% c("NA","","NULL"), NA))) %>%
+    dplyr::mutate_if(is.character, dplyr::funs(replace(., . %in% c("NA","","NULL"), NA))) %>%
     tibble::as.tibble()
 
   return(result)
