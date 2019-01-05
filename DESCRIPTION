@@ -8,10 +8,12 @@ Description: API client to Setlist.FM API
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Imports:
+Depends:
     dplyr,
     tibble,
     httr,
     purrr,
     magrittr,
     readr
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.1

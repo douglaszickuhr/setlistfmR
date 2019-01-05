@@ -1,11 +1,15 @@
 #' @name request
 #' @author Douglas Zickuhr, \email{douglasrsl@gmail.com}.
+#'
 #' @export
+#'
 #' @title Generate a request to SetListFM API.
 #' @description Returns the content of the request
+#'
 #' @param endpoint Endpoint to be reached
 #' @param key API key.
 #' @param params Parameters to be added to request.
+#'
 #' @return \code{request} returns a list with the request
 #' @examples
 #'
@@ -17,7 +21,8 @@
 #' params = list(artistName = artist))
 #' }
 #'
-#'
+#' @importFrom httr user_agent GET http_error add_headers accept_json http_status content
+#' @importFrom jsonlite fromJSON
 
 get_request <- function(endpoint, key, params){
   ua <- httr::user_agent("http://github.com/douglaszickuhr")
@@ -43,20 +48,21 @@ get_request <- function(endpoint, key, params){
     page <- page + 1
     params[["p"]] <- page
 
-    req <- httr::GET(paste("https://api.setlist.fm/rest/1.0",endpoint,sep = "/"),
-                     httr::add_headers("x-api-key" = key),
-                     httr::accept_json(),
-                     query = params,
-                     ua = ua)
+    req <- RETRY(verb = "GET",
+                 url = paste("https://api.setlist.fm/rest/1.0",endpoint,sep = "/"),
+                 add_headers("x-api-key" = key),
+                 accept_json(),
+                 query = params,
+                 ua = ua)
 
-    if (httr::http_error(req)){
-      stop(paste("Setlist.FM API failed.",httr::http_status(req)$message), call. = FALSE)
+    if (http_error(req)){
+      stop(paste("Setlist.FM API failed.",http_status(req)$message), call. = FALSE)
     }
 
-    con <- httr::content(req, encoding = "UTF-8",
+    con <- content(req, encoding = "UTF-8",
                          as = "text",
                          type = "application/json")
-    con <- jsonlite::fromJSON(con,flatten = TRUE,simplifyDataFrame = TRUE)
+    con <- fromJSON(con,flatten = TRUE,simplifyDataFrame = TRUE)
 
     items_per_page <- items_per_page + con$itemsPerPage
     total <- con$total
