@@ -15,30 +15,27 @@
 #' search_term = artist)
 #' }
 #'
-#'
+#' @importFrom tidyr unnest
+#' @importFrom dplyr mutate
 
-search_setlists <- function(key, search_params){
-  if (missing(key)) {
-    stop("API key must be specified.", call. = FALSE)
-  }
-
+search_setlists <- function(search_params, key = return_key()){
   if (missing(search_params)){
     stop("The search params must be specified", call. = FALSE)
   }
 
   params <- search_params
 
-  setlists <- setlistfmR::get_request(endpoint = "search/setlists",
-                                     key = key,
-                                     params = params) %>%
-    tidyr::unnest(sets.set)
+  setlists <- get_request(endpoint = "search/setlists",
+                          key = key,
+                          params = params) %>%
+    unnest(sets.set) %>%
+    clean_names()
 
-  if ("song"  %in% colnames(setlists)){
-    setlists %<>%
+  if ("song" %in% colnames(setlists)){
+    setlists <- setlists %>%
       mutate(songs = as.list(song)) %>%
-      tidyr::unnest(songs)
+      unnest(songs)
   }
-
 
   return(setlists)
 }

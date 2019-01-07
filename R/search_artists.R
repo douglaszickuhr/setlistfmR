@@ -1,4 +1,5 @@
-#' @name search_artists
+#' @name search_artist
+#'
 #' @author Douglas Zickuhr, \email{douglasrsl@gmail.com}.
 #' @export
 #' @title Search Artists on SetListFM API.
@@ -16,19 +17,16 @@
 #' search_term = artist)
 #' }
 #'
-#'
+#' @importFrom dplyr distinct
+#' @importFrom janitor clean_names
 
-search_artist <- function(key, search_term, search_by = "artistName"){
-  if (missing(key)) {
-    stop("API key must be specified.", call. = FALSE)
-  }
-
+search_artist <- function(search_term, search_by = "artistName", key = return_key()){
   if (missing(search_term)){
     stop("The search term must be specified", call. = FALSE)
   }
 
   if (!search_by %in% c("artistMbid","artistName","artistTmid")){
-    stop("Parameter search_by for search/artists must be artistMbid, artistName or artistTmid.", call. = FALSE)
+    stop("Parameter search_by for search_artist must be artistMbid, artistName or artistTmid.", call. = FALSE)
   }
 
 
@@ -36,10 +34,11 @@ search_artist <- function(key, search_term, search_by = "artistName"){
   params[["sort"]] <- "relevance"
   params[[search_by]] <- search_term
 
-  artists <- setlistfmR::get_request(endpoint = "search/artists",
-                                 key = key,
-                                 params = params) %>%
-    dplyr::distinct()
+  artists <- get_request(endpoint = "search/artists",
+                         key = key,
+                         params = params) %>%
+    distinct() %>%
+    clean_names()
 
   return(artists)
 }

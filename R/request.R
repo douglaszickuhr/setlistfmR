@@ -23,6 +23,10 @@
 #'
 #' @importFrom httr user_agent GET http_error add_headers accept_json http_status content
 #' @importFrom jsonlite fromJSON
+#' @importFrom purrr map_df
+#' @importFrom magrittr extract
+#' @importFrom dplyr mutate_if funs
+#' @importFrom tibble as.tibble
 
 get_request <- function(endpoint, key, params){
   ua <- httr::user_agent("http://github.com/douglaszickuhr")
@@ -71,10 +75,8 @@ get_request <- function(endpoint, key, params){
     result[[page]] <- con[[length(con)]]
   }
 
-  result %<>%
-    purrr::map_df(magrittr::extract) %>%
-    dplyr::mutate_if(is.character, dplyr::funs(replace(., . %in% c("NA","","NULL"), NA))) %>%
-    tibble::as.tibble()
-
-  return(result)
+  result %>%
+    map_df(extract) %>%
+    mutate_if(is.character, funs(replace(., . %in% c("NA","","NULL"), NA))) %>%
+    as.tibble()
 }

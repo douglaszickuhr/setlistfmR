@@ -4,12 +4,12 @@
 \alias{search_setlists}
 \title{Search Setlists on SetListFM API.}
 \usage{
-search_setlists(key, search_params)
+search_setlists(search_params, key = return_key())
 }
 \arguments{
-\item{key}{API key.}
-
 \item{search_params}{List of parameters to be used on the search}
+
+\item{key}{API key.}
 }
 \value{
 \code{search_artists} returns a tibble with artists data
@@ -25,7 +25,6 @@ search_term <- "the-beatles"
 search_artists(key = key,
 search_term = artist)
 }
-
 
 }
 \author{
